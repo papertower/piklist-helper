@@ -19,7 +19,7 @@ To get started (including the validations), simply add the PiklistHelper.php fil
 ```
 if ( !class_exists('PiklistHelper') ) {
   require_once('PiklistHelper.php');
-  PiklistHelper::initiate();
+  PiklistHelper::Initiate();
 }
 ```
 
