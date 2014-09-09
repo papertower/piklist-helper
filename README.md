@@ -1,7 +1,7 @@
 PiklistHelper
 =============
 
-A helper for adding additional filters, validations, and functionality to [Piklist](piklist.com). Piklist is a framework built on top of Wordpress. It takes a lot of common tasks (such as creating meta-boxes, settings pages, etc.) and makes it fast and easy. On top of that it makes things like Post to Post relationships and taxonomy meta possible.
+A helper for adding additional filters, validations, and functionality to [Piklist](http://piklist.com). Piklist is a framework built on top of Wordpress. It takes a lot of common tasks (such as creating meta-boxes, settings pages, etc.) and makes it fast and easy. On top of that it makes things like Post to Post relationships and taxonomy meta possible.
 
 ### Why a Piklist Helper? Isn't Piklist Perfect?
 
