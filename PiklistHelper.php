@@ -9,8 +9,9 @@
  *    > date-range
  *    > number
  *    > group-mismatch
+ *    > require-group
  *
- * @version 0.2.0
+ * @version 0.3.0
  */
 class PiklistHelper {
   /**
@@ -88,6 +89,9 @@ class PiklistHelper {
       ),
       'group-mismatch'=> array(
         'callback'      => array(__CLASS__, 'check_group_mismatch')
+      ),
+      'require-group' => array(
+        'callback'      => array(__CLASS__, 'check_group_requirement')
       )
     );
   }
@@ -195,6 +199,30 @@ class PiklistHelper {
     foreach($fields as $key => $value) {
       if (++$duplicates[$value] > 1 )
         return __('cannot have duplicate values');
+    }
+
+    return true;
+  }
+
+  /**
+   * For validation use. Do not call directly.
+   *
+   * Checks a group of fields to make sure that either none or all of the fields are filled
+   *
+   * @since 0.3.0
+   */
+  public static function check_group_requirement($values, $fields, $options) {
+    if ( !is_array($values) || !isset($values[0]) )
+      return __('is intended to be used for a group');
+
+    $is_empty = true;
+    foreach($values[0] as $key => $value) {
+      if ( $is_empty ) {
+        $is_empty = empty($value);
+          
+      } else if (empty($value)) {
+        return __('must have all the fields filled');
+      }
     }
 
     return true;
