@@ -77,23 +77,32 @@ class PiklistHelper {
    */
   public static function add_validations() {
     return array(
-      'youtube-url'   => array(
-        'rule'          =>  '/^https?:\/\/(www.)?youtu(be\.com|\.be)\/(watch\?v=)?([[:alnum:]_-]+)$/',
-        'message'       => __('is not a valid youtube url')
+      'youtube-url'     => array(
+        'rule'            => '/^https?:\/\/(www.)?youtu(be\.com|\.be)\/(watch\?v=)?([[:alnum:]_-]+)$/',
+        'message'         => __('is not a valid youtube url')
       ),
-      'number'        => array(
-        'callback'      => array(__CLASS__, 'check_number'),
+      'vimeo-share-url' => array(
+        'rule'            => '/^\/\/player\.vimeo\.com\/video\/\d+$/',
+        'message'         => __('is not a valid vimeo share url')
       ),
-      'date-range'    => array(
-        'callback'      => array(__CLASS__, 'check_date_range'),
+      'zip-code'        => array(
+        'rule'            => '/^\d{5}(?:-\d{4})?$/',
+        'message'         => __('is not a valid US zip code')
       ),
-      'group-mismatch'=> array(
-        'callback'      => array(__CLASS__, 'check_group_mismatch')
+      'number'          => array(
+        'callback'        => array(__CLASS__, 'check_number'),
       ),
-      'require-group' => array(
-        'callback'      => array(__CLASS__, 'check_group_requirement')
+      'date-range'      => array(
+        'callback'        => array(__CLASS__, 'check_date_range'),
+      ),
+      'group-mismatch'  => array(
+        'callback'        => array(__CLASS__, 'check_group_mismatch')
+      ),
+      'require-group'   => array(
+        'callback'        => array(__CLASS__, 'check_group_requirement')
       )
     );
+
   }
 
 
