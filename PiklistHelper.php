@@ -5,13 +5,14 @@
  * expands on it's capabilities
  *
  * Included Validations
- *    > youtube-urls
- *    > date-range
- *    > number
- *    > group-mismatch
- *    > require-group
+ *    > youtube-urls, vimeo-urls
+ *    > date-range, number
+ *    > group-mismatch, require-group
  *
- * @version 0.3.0
+ * Included Sanitizations
+ *    > youtube-id, vimeo-id
+ *
+ * @version 0.4.0
  */
 class PiklistHelper {
   /**
@@ -21,8 +22,9 @@ class PiklistHelper {
   public static function Initiate() {
     if ( !class_exists('Piklist') ) return;
 
-    // Validations
+    // Validations & Sanitizations
     add_filter('piklist_validation_rules', array(__CLASS__, 'add_validations'), 11);
+    add_filter('sanitization_rules', array(__CLASS__, 'add_sanitizations'), 11);
 
     // Add constant type support to post types
     add_filter( 'piklist_add_part', array(__CLASS__, 'add_constant_support') );
@@ -68,6 +70,24 @@ class PiklistHelper {
 
 
   /*****************************************************/
+  /************ SANITIZING FILTER FUNCTION *************/
+  /*****************************************************/
+  /**
+   * Not to be called directly.
+   * Provides new types of sanitization
+   */
+  public static function add_sanitizations() {
+    return array(
+      'youtube-id'    => array(
+        'callback'      => array(__CLASS__, 'sanitize_youtube_id')
+      ),
+      'vimeo-id'    => array(
+        'callback'      => array(__CLASS__, 'sanitize_vimeo_id')
+      )
+    );
+  }
+
+  /*****************************************************/
   /************ VALIDATION FILTER FUNCTION *************/
   /*****************************************************/
 
@@ -81,8 +101,8 @@ class PiklistHelper {
         'rule'            => '/^https?:\/\/(www.)?youtu(be\.com|\.be)\/(watch\?v=)?([[:alnum:]_-]+)$/',
         'message'         => __('is not a valid youtube url')
       ),
-      'vimeo-share-url' => array(
-        'rule'            => '/^\/\/player\.vimeo\.com\/video\/\d+$/',
+      'vimeo-url' => array(
+        'rule'            => '(?>player\.)?vimeo\.com\/(?>video\/)?(\d+)$',
         'message'         => __('is not a valid vimeo share url')
       ),
       'zip-code'        => array(
@@ -102,10 +122,22 @@ class PiklistHelper {
         'callback'        => array(__CLASS__, 'check_group_requirement')
       )
     );
-
   }
 
 
+
+  /*****************************************************/
+  /*********** SANITIZING CALLBACK FUNCTIONS ***********/
+  /*****************************************************/
+  public static function sanitize_youtube_id($value, $field) {
+    $pattern = '/youtu(?>be\.com|\.be)\/(?>watch\?v=|embed\/)?([[:alnum:]_-]+)$/';
+    return preg_match($pattern, $value, $matches) ? $matches[0] : $value;
+  }
+
+  public static function sanitize_vimeo_id($value, $field) {
+    $pattern = '/(?>player\.)?vimeo\.com\/(?>video\/)?(\d+)$/i';
+    return preg_match($pattern, $value, $matches) ? $matches[0] : $value;
+  }
 
   /*****************************************************/
   /*********** VALIDATION CALLBACK FUNCTIONS ***********/
