@@ -98,7 +98,7 @@ class PiklistHelper {
   public static function add_validations() {
     return array(
       'youtube-url'     => array(
-        'rule'            => '/^https?:\/\/(www.)?youtu(be\.com|\.be)\/(watch\?v=)?([[:alnum:]_-]+)$/',
+        'rule'            => '/youtu(?>be\.com|\.be)\/(?>watch\?v=|embed\/)?([[:alnum:]_-]+)$/',
         'message'         => __('is not a valid youtube url')
       ),
       'vimeo-url' => array(
