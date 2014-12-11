@@ -131,12 +131,12 @@ class PiklistHelper {
   /*****************************************************/
   public static function sanitize_youtube_id($value, $field) {
     $pattern = '/youtu(?>be\.com|\.be)\/(?>watch\?v=|embed\/)?([[:alnum:]_-]+)$/';
-    return preg_match($pattern, $value, $matches) ? $matches[0] : $value;
+    return preg_match($pattern, $value, $matches) ? $matches[1] : $value;
   }
 
   public static function sanitize_vimeo_id($value, $field) {
     $pattern = '/(?>player\.)?vimeo\.com\/(?>video\/)?(\d+)$/i';
-    return preg_match($pattern, $value, $matches) ? $matches[0] : $value;
+    return preg_match($pattern, $value, $matches) ? $matches[1] : $value;
   }
 
   /*****************************************************/
