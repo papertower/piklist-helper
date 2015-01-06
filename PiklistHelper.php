@@ -12,7 +12,7 @@
  * Included Sanitizations
  *    > youtube-id, vimeo-id
  *
- * @version 0.4.0
+ * @version 0.5.0
  */
 class PiklistHelper {
   /**
@@ -27,7 +27,7 @@ class PiklistHelper {
     add_filter('sanitization_rules', array(__CLASS__, 'add_sanitizations'), 11);
 
     // Add constant type support to post types
-    add_filter( 'piklist_add_part', array(__CLASS__, 'add_constant_support') );
+    add_filter( 'piklist_add_part', array(__CLASS__, 'add_constant_support'), 1, 2 );
   }
 
 
@@ -283,15 +283,34 @@ class PiklistHelper {
    * @since 0.1.0
    */
   public static function add_constant_support($data) {
-    if ( empty($data['type']) )
-      return $data;
+    if ( !empty($data['type']) ) {
+      $data['type'] = preg_replace_callback('/\[(\w+)\]/', array(__CLASS__, 'apply_match_constant'), $data['type']);
+      $data['type'] = preg_replace_callback('/{(\w+)}/', array(__CLASS__, 'apply_match_variable'), $data['type']);
+    }
 
-    $match = array();
-    if (preg_match( '/^\[(\w+)\]$/', $data['type'], $match )) {
-      $data['type'] = constant($match[1]);
+    if ( !empty($data['template']) ) {
+      $data['template'] = preg_replace_callback('/\[(\w+)\]/', array(__CLASS__, 'apply_match_constant'), $data['template']);
+      $data['template'] = preg_replace_callback('/{(\w+)}/', array(__CLASS__, 'apply_match_variable'), $data['template']);
     }
 
     return $data;
+  }
+
+  /**
+   * Callback for add_constant_support
+   * @since 0.5.0
+   */
+  public static function apply_match_constant($matches) {
+    return constant($matches[1]);
+  }
+
+  /**
+   * Callback for add_constant_support
+   * @since 0.5.0
+   */
+  public static function apply_match_variable($matches) {
+    if ( isset($$matches[1]) ) return $$matches[1];
+    if ( isset($GLOBALS[$matches[1]]) ) return $GLOBALS[$matches[1]];
   }
 }
 
