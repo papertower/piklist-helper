@@ -12,7 +12,7 @@
  * Included Sanitizations
  *    > youtube-id, vimeo-id
  *
- * @version 0.5.0
+ * @version 0.5.1
  */
 class PiklistHelper {
   /**
@@ -27,7 +27,7 @@ class PiklistHelper {
     add_filter('sanitization_rules', array(__CLASS__, 'add_sanitizations'), 11);
 
     // Add constant type support to post types
-    add_filter( 'piklist_add_part', array(__CLASS__, 'add_constant_support'), 1, 2 );
+    add_filter( 'piklist_part_add', array(__CLASS__, 'add_constant_support'), 1, 2 );
   }
 
 
@@ -76,15 +76,15 @@ class PiklistHelper {
    * Not to be called directly.
    * Provides new types of sanitization
    */
-  public static function add_sanitizations() {
-    return array(
+  public static function add_sanitizations($rules) {
+    return array_merge($rules, array(
       'youtube-id'    => array(
         'callback'      => array(__CLASS__, 'sanitize_youtube_id')
       ),
       'vimeo-id'    => array(
         'callback'      => array(__CLASS__, 'sanitize_vimeo_id')
       )
-    );
+    ));
   }
 
   /*****************************************************/
@@ -95,19 +95,22 @@ class PiklistHelper {
    * Filter only, not to be called directly.
    * Provides new types of validation types
    */
-  public static function add_validations() {
-    return array(
+  public static function add_validations($rules) {
+    return array_merge($rules, array(
       'youtube-url'     => array(
-        'rule'            => '/youtu(?>be\.com|\.be)\/(?>watch\?v=|embed\/)?([[:alnum:]_-]+)$/',
+        'rule'            => '/youtu(?>be\.com|\.be)\/(?>watch\?v=|embed\/)?([[:alnum:]_-]+)$/i',
         'message'         => __('is not a valid youtube url')
       ),
-      'vimeo-url' => array(
-        'rule'            => '(?>player\.)?vimeo\.com\/(?>video\/)?(\d+)$',
+      'vimeo-url'       => array(
+        'rule'            => '/(?>player\.)?vimeo\.com\/(?>video\/)?(\d+)$/i',
         'message'         => __('is not a valid vimeo share url')
       ),
       'zip-code'        => array(
         'rule'            => '/^\d{5}(?:-\d{4})?$/',
         'message'         => __('is not a valid US zip code')
+      ),
+      'video-url'       => array(
+        'callback'        => array(__CLASS__, 'check_video_url'),
       ),
       'number'          => array(
         'callback'        => array(__CLASS__, 'check_number'),
@@ -121,7 +124,7 @@ class PiklistHelper {
       'require-group'   => array(
         'callback'        => array(__CLASS__, 'check_group_requirement')
       )
-    );
+    ));
   }
 
 
@@ -130,7 +133,7 @@ class PiklistHelper {
   /*********** SANITIZING CALLBACK FUNCTIONS ***********/
   /*****************************************************/
   public static function sanitize_youtube_id($value, $field) {
-    $pattern = '/youtu(?>be\.com|\.be)\/(?>watch\?v=|embed\/)?([[:alnum:]_-]+)$/';
+    $pattern = '/youtu(?>be\.com|\.be)\/(?>watch\?v=|embed\/)?([[:alnum:]_-]+)$/i';
     return preg_match($pattern, $value, $matches) ? $matches[1] : $value;
   }
 
@@ -145,6 +148,29 @@ class PiklistHelper {
 
   /**
    * For validation use. Do not call directly.
+   * 
+   * Checks that a url is either a youtube or vimeo url
+   * @since 0.5.1
+   */
+  public static function check_video_url($index, $value, $options, $field, $fields) {
+    $url = parse_url($value, PHP_URL_HOST);
+    if ( false === $url ) return __('is not a valid video url');
+
+    switch(strtolower(str_ireplace('www.', '', $url))) {
+      case 'youtube.com':
+      case 'youtu.be':
+        return preg_match('/youtu(?>be\.com|\.be)\/(?>watch\?v=|embed\/)?([[:alnum:]_-]+)$/i', $value)
+          ? true : __('is not a valid youtube url');
+      case 'vimeo.com':
+        return preg_match('/(?>player\.)?vimeo\.com\/(?>video\/)?(\d+)$/i', $value)
+          ? true : __('is not a valid vimeo url');
+    }
+
+    return __('is not a valid vimeo or youtube url');
+  }
+
+  /**
+   * For validation use. Do not call directly.
    *
    * Checks that a field is numeric with the following options:
    *    integer:  number must be an integer
@@ -155,7 +181,7 @@ class PiklistHelper {
    *
    * @since 0.1.0
    */
-  public static function check_number($value, $field, $options) {
+  public static function check_number($index, $value, $options, $field, $fields) {
     if ( !is_numeric($value) )
       return __('must be a number');
 
@@ -230,7 +256,7 @@ class PiklistHelper {
    *
    * @since 0.2.0
    */
-  public static function check_group_mismatch($values, $fields, $options) {
+  public static function check_group_mismatch($index, $value, $options, $field, $fields) {
     if ( !is_array($values) || !isset($values[0]) )
       return __('is intended to be used for a group of text or select fields');
 
@@ -252,7 +278,7 @@ class PiklistHelper {
    *
    * @since 0.3.0
    */
-  public static function check_group_requirement($values, $fields, $options) {
+  public static function check_group_requirement($index, $value, $options, $field, $fields) {
     if ( !is_array($values) || !isset($values[0]) )
       return __('is intended to be used for a group');
 
