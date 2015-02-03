@@ -10,9 +10,10 @@
  *    > group-mismatch, require-group
  *
  * Included Sanitizations
- *    > youtube-id, vimeo-id
+ *    > youtube-id, vimeo-id,
+ *    > esc_url
  *
- * @version 0.5.1
+ * @version 0.5.2
  */
 class PiklistHelper {
   /**
@@ -83,6 +84,9 @@ class PiklistHelper {
       ),
       'vimeo-id'    => array(
         'callback'      => array(__CLASS__, 'sanitize_vimeo_id')
+      ),
+      'esc_url'     => array(
+        'callback'      => array(__CLASS__, 'sanitize_esc_url')
       )
     ));
   }
@@ -142,6 +146,10 @@ class PiklistHelper {
     return preg_match($pattern, $value, $matches) ? $matches[1] : $value;
   }
 
+  public static function sanitize_esc_url($value, $field) {
+    return esc_url($value);
+  }
+
   /*****************************************************/
   /*********** VALIDATION CALLBACK FUNCTIONS ***********/
   /*****************************************************/
@@ -153,6 +161,8 @@ class PiklistHelper {
    * @since 0.5.1
    */
   public static function check_video_url($index, $value, $options, $field, $fields) {
+    if ( $field['add_more'] && empty($value) ) return true;
+
     $url = parse_url($value, PHP_URL_HOST);
     if ( false === $url ) return __('is not a valid video url');
 
