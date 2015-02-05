@@ -8,12 +8,13 @@
  *    > youtube-urls, vimeo-urls
  *    > date-range, number
  *    > group-mismatch, require-group
+ *    > date
  *
  * Included Sanitizations
  *    > youtube-id, vimeo-id,
  *    > esc_url
  *
- * @version 0.5.2
+ * @version 0.5.3
  */
 class PiklistHelper {
   /**
@@ -116,6 +117,9 @@ class PiklistHelper {
       'video-url'       => array(
         'callback'        => array(__CLASS__, 'check_video_url'),
       ),
+      'date'            => array(
+        'callback'        => array(__CLASS__, 'check_date'),
+      ),
       'number'          => array(
         'callback'        => array(__CLASS__, 'check_number'),
       ),
@@ -177,6 +181,20 @@ class PiklistHelper {
     }
 
     return __('is not a valid vimeo or youtube url');
+  }
+
+  /**
+   * For validation use. Do not call directly.
+   *
+   * Checks that a field has a readable date provided
+   * @since 0.5.3
+   */
+  public static function check_date($index, $value, $options, $field, $fields) {
+    $date = date_parse($value);
+    if ( is_array($date) && $date['error_count'] == 0 && checkdate($date['month'], $date['day'], $date['year']) )
+      return true;
+    else
+      return __('must be a valid date format');
   }
 
   /**
