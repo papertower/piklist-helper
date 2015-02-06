@@ -12,9 +12,9 @@
  *
  * Included Sanitizations
  *    > youtube-id, vimeo-id,
- *    > esc_url
+ *    > esc_url, external-url
  *
- * @version 0.5.3
+ * @version 0.5.4
  */
 class PiklistHelper {
   /**
@@ -26,7 +26,7 @@ class PiklistHelper {
 
     // Validations & Sanitizations
     add_filter('piklist_validation_rules', array(__CLASS__, 'add_validations'), 11);
-    add_filter('sanitization_rules', array(__CLASS__, 'add_sanitizations'), 11);
+    add_filter('piklist_sanitization_rules', array(__CLASS__, 'add_sanitizations'), 11);
 
     // Add constant type support to post types
     add_filter( 'piklist_part_add', array(__CLASS__, 'add_constant_support'), 1, 2 );
@@ -88,6 +88,9 @@ class PiklistHelper {
       ),
       'esc_url'     => array(
         'callback'      => array(__CLASS__, 'sanitize_esc_url')
+      ),
+      'external-url'     => array(
+        'callback'      => array(__CLASS__, 'sanitize_external_url')
       )
     ));
   }
@@ -152,6 +155,14 @@ class PiklistHelper {
 
   public static function sanitize_esc_url($value, $field) {
     return esc_url($value);
+  }
+
+  public static function sanitize_external_url($value, $field, $options) {
+    $options = wp_parse_args($options, array(
+      'scheme'  => 'http'
+    ));
+    return parse_url($value, PHP_URL_SCHEME) === null
+      ? "{$options['scheme']}://$value" : $value;
   }
 
   /*****************************************************/
