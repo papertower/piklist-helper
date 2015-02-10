@@ -257,7 +257,7 @@ class PiklistHelper {
    *
    * @since 0.1.0
    */
-  public static function check_date_range($values, $fields, $options) {
+    public static function check_date_range($index, $values, $options, $field, $fields) {
     if ( !is_array($values) || !isset($values[0]) )
       return __('is intended to be used for a group of datepickers');
 
