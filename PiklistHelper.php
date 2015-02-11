@@ -8,13 +8,13 @@
  *    > youtube-urls, vimeo-urls
  *    > date-range, number
  *    > group-mismatch, require-group
- *    > date
+ *    > date, video-url
  *
  * Included Sanitizations
  *    > youtube-id, vimeo-id,
  *    > esc_url, external-url
  *
- * @version 0.5.4
+ * @version 0.5.5
  */
 class PiklistHelper {
   /**
@@ -110,7 +110,7 @@ class PiklistHelper {
         'message'         => __('is not a valid youtube url')
       ),
       'vimeo-url'       => array(
-        'rule'            => '/(?>player\.)?vimeo\.com\/(?>video\/)?(\d+)$/i',
+        'rule'            => '~(?>player\.)?vimeo\.com/(?>[a-z/]+)?(\d+)$~i',
         'message'         => __('is not a valid vimeo share url')
       ),
       'zip-code'        => array(
