@@ -19,14 +19,6 @@ Anything that you feel could improve the general experience with Piklist while r
 
 ### How do I use it?
 
-It's very easy! PiklistHelper is a general class with [static functions](http://php.net/manual/en/language.oop5.static.php). So just use them as you normally would. Everything in the PiklistHelper.php file is well documented, so feel free to read through it, and [phpdoc](http://www.phpdoc.org/) can be used to generate a document if you'd like.
-
-To get started (including the validations), simply add the PiklistHelper.php file somewhere in your code and add the following to your functions.php or plugin root:
-```
-if ( !class_exists('PiklistHelper') ) {
-  require_once('PiklistHelper.php');
-  PiklistHelper::Initiate();
-}
-```
+Just install it like you would any other plugin! There are also functions available for use if you'd like. Just check out /includes/class-piklist-helper.php!
 
 Happy coding!
