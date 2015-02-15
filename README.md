@@ -1,6 +1,12 @@
 PiklistHelper
 =============
 
+### Before Upgrading to 0.6!
+
+Please note that, as of 0.6, Piklist Helper is no longer just a class. It's now a plugin. This gives all the conveniences of plugins, allows things to be a bit more organized without complicating use, makes it usable in the theme and plugins without in-fighting, and removes the need to initialize it. Install, activate, and it just works. :)
+
+---
+
 A helper for adding additional filters, validations, and functionality to [Piklist](http://piklist.com). Piklist is a framework built on top of Wordpress. It takes a lot of common tasks (such as creating meta-boxes, settings pages, etc.) and makes it fast and easy. On top of that it makes things like Post to Post relationships and taxonomy meta possible.
 
 ### Why a Piklist Helper? Isn't Piklist Perfect?

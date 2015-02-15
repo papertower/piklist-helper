@@ -1,103 +1,15 @@
 <?php
-
 /**
- * Adds useful validations and such to Piklist as well as
- * expands on it's capabilities
- *
  * Included Validations
  *    > youtube-urls, vimeo-urls
  *    > date-range, number
  *    > group-mismatch, require-group
  *    > date, video-url
- *
- * Included Sanitizations
- *    > youtube-id, vimeo-id,
- *    > esc_url, external-url
- *
- * @version 0.5.5
  */
-class PiklistHelper {
-  /**
-   * Adds all the included validations and additiions to Piklist.
-   * Make sure you call this after including the file: PiklistHelper::Initiate();
-   */
-  public static function Initiate() {
-    if ( !class_exists('Piklist') ) return;
-
-    // Validations & Sanitizations
+class PiklistHelperValidations {
+  public static function _construct() {
     add_filter('piklist_validation_rules', array(__CLASS__, 'add_validations'), 11);
-    add_filter('piklist_sanitization_rules', array(__CLASS__, 'add_sanitizations'), 11);
-
-    // Add constant type support to post types
-    add_filter( 'piklist_part_add', array(__CLASS__, 'add_constant_support'), 1, 2 );
   }
-
-
-
-  /*****************************************************/
-  /************* GENERAL PURPOSE FUNCTIONS *************/
-  /*****************************************************/
-
-  /**
-   * Parses a piklist group into better format for iteration
-   * @since 0.1.0
-   * @param array $array
-   * @return array
-   */
-  public static function parse_array($array) {
-    if ( empty($array) )
-      return array();
-
-    $keys = array_keys($array);
-    if ( empty($keys) )
-      return array();
-
-    $results = $values = array();
-    $count = count($array[$keys[0]]);
-    for ($index = 0; $index < $count; $index++) {
-      foreach($keys as $key_index => $key) {
-        $value = ( isset($array[$key][$index]) ) ? $array[$key][$index] : null;
-        if ( is_array($value) && !( isset($value[0][0]) || empty($value[0]) ) ) {
-          $values[$key] = self::parse_array($value, true);
-        } else
-          $values[$key] = $value;
-      }
-
-      $results[] = $values;
-    }
-
-    return $results;
-  }
-
-
-
-  /*****************************************************/
-  /************ SANITIZING FILTER FUNCTION *************/
-  /*****************************************************/
-  /**
-   * Not to be called directly.
-   * Provides new types of sanitization
-   */
-  public static function add_sanitizations($rules) {
-    return array_merge($rules, array(
-      'youtube-id'    => array(
-        'callback'      => array(__CLASS__, 'sanitize_youtube_id')
-      ),
-      'vimeo-id'    => array(
-        'callback'      => array(__CLASS__, 'sanitize_vimeo_id')
-      ),
-      'esc_url'     => array(
-        'callback'      => array(__CLASS__, 'sanitize_esc_url')
-      ),
-      'external-url'     => array(
-        'callback'      => array(__CLASS__, 'sanitize_external_url')
-      )
-    ));
-  }
-
-  /*****************************************************/
-  /************ VALIDATION FILTER FUNCTION *************/
-  /*****************************************************/
 
   /**
    * Filter only, not to be called directly.
@@ -137,37 +49,6 @@ class PiklistHelper {
       )
     ));
   }
-
-
-
-  /*****************************************************/
-  /*********** SANITIZING CALLBACK FUNCTIONS ***********/
-  /*****************************************************/
-  public static function sanitize_youtube_id($value, $field) {
-    $pattern = '/youtu(?>be\.com|\.be)\/(?>watch\?v=|embed\/)?([[:alnum:]_-]+)$/i';
-    return preg_match($pattern, $value, $matches) ? $matches[1] : $value;
-  }
-
-  public static function sanitize_vimeo_id($value, $field) {
-    $pattern = '/(?>player\.)?vimeo\.com\/(?>video\/)?(\d+)$/i';
-    return preg_match($pattern, $value, $matches) ? $matches[1] : $value;
-  }
-
-  public static function sanitize_esc_url($value, $field) {
-    return esc_url($value);
-  }
-
-  public static function sanitize_external_url($value, $field, $options) {
-    $options = wp_parse_args($options, array(
-      'scheme'  => 'http'
-    ));
-    return parse_url($value, PHP_URL_SCHEME) === null
-      ? "{$options['scheme']}://$value" : $value;
-  }
-
-  /*****************************************************/
-  /*********** VALIDATION CALLBACK FUNCTIONS ***********/
-  /*****************************************************/
 
   /**
    * For validation use. Do not call directly.
@@ -333,50 +214,5 @@ class PiklistHelper {
 
     return true;
   }
-
-
-
-  /*****************************************************/
-  /************ PIKLIST EXTENSION FUNCTIONS ************/
-  /*****************************************************/
-
-  /**
-   * Filter Only, not to be called directly.
-   * Adds constant support to the post type. To use wrap
-   * the name in square brackets. Example: [POST_CONSTANT]
-   *
-   * @since 0.1.0
-   */
-  public static function add_constant_support($data) {
-    if ( !empty($data['type']) ) {
-      $data['type'] = preg_replace_callback('/\[(\w+)\]/', array(__CLASS__, 'apply_match_constant'), $data['type']);
-      $data['type'] = preg_replace_callback('/{(\w+)}/', array(__CLASS__, 'apply_match_variable'), $data['type']);
-    }
-
-    if ( !empty($data['template']) ) {
-      $data['template'] = preg_replace_callback('/\[(\w+)\]/', array(__CLASS__, 'apply_match_constant'), $data['template']);
-      $data['template'] = preg_replace_callback('/{(\w+)}/', array(__CLASS__, 'apply_match_variable'), $data['template']);
-    }
-
-    return $data;
-  }
-
-  /**
-   * Callback for add_constant_support
-   * @since 0.5.0
-   */
-  public static function apply_match_constant($matches) {
-    return constant($matches[1]);
-  }
-
-  /**
-   * Callback for add_constant_support
-   * @since 0.5.0
-   */
-  public static function apply_match_variable($matches) {
-    if ( isset($$matches[1]) ) return $$matches[1];
-    if ( isset($GLOBALS[$matches[1]]) ) return $GLOBALS[$matches[1]];
-  }
 }
-
 ?>
