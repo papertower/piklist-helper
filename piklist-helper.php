@@ -13,7 +13,7 @@
 add_action('init', function() {
   // Check for Piklist
   if(is_admin()) {
-    include_once('includes/class-piklist-checker.php');
+    include_once('lib/class-piklist-checker.php');
     if (!piklist_checker::check(__FILE__)) return;
   }
 });
