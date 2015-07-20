@@ -29,6 +29,10 @@ class PiklistHelperValidations {
         'rule'            => '/^\d{5}(?:-\d{4})?$/',
         'message'         => __('is not a valid US zip code')
       ),
+      'google-analytics'=> array(
+        'rule'            => '~UA-\d{8}-\d~i',
+        'message'         => __('is not a valid analytics key')
+      ),
       'video-url'       => array(
         'callback'        => array(__CLASS__, 'check_video_url'),
       ),
