@@ -61,22 +61,30 @@ class PiklistHelperValidations {
    * @since 0.5.1
    */
   public static function check_video_url($index, $value, $options, $field, $fields) {
-    if ( $field['add_more'] && empty($value) ) return true;
+    foreach((array)$value as $url) {
+      if ( '' === $url ) continue;
+      $host = parse_url($url, PHP_URL_HOST);
 
-    $url = parse_url($value, PHP_URL_HOST);
-    if ( false === $url ) return __('is not a valid video url');
+      if ( false === $host ) return __('is not a valid video url');
 
-    switch(strtolower(str_ireplace('www.', '', $url))) {
-      case 'youtube.com':
-      case 'youtu.be':
-        return preg_match('/youtu(?>be\.com|\.be)\/(?>watch\?v=|embed\/)?([[:alnum:]_-]+)$/i', $value)
-          ? true : __('is not a valid youtube url');
-      case 'vimeo.com':
-        return preg_match('/(?>player\.)?vimeo\.com\/(?>video\/)?(\d+)$/i', $value)
-          ? true : __('is not a valid vimeo url');
+      switch(strtolower(str_ireplace('www.', '', $host))) {
+        case 'youtube.com':
+        case 'youtu.be':
+          if ( !preg_match('/youtu(?>be\.com|\.be)\/(?>watch\?v=|embed\/)?([[:alnum:]_-]+)$/i', $url) ) {
+            return __('is not a valid youtube url');
+          }
+          break;
+        case 'vimeo.com':
+          if ( !preg_match('/(?>player\.)?vimeo\.com\/(?>video\/)?(\d+)$/i', $url) ) {
+            return __('is not a valid vimeo url');
+          }
+          break;
+        default:
+          return __('is not a valid vimeo or youtube url');
+      }
     }
 
-    return __('is not a valid vimeo or youtube url');
+    return true;
   }
 
   /**
