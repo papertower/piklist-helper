@@ -56,7 +56,7 @@ class PiklistHelperValidations {
 
   /**
    * For validation use. Do not call directly.
-   * 
+   *
    * Checks that a url is either a youtube or vimeo url
    * @since 0.5.1
    */
@@ -151,10 +151,7 @@ class PiklistHelperValidations {
    * @since 0.1.0
    */
   public static function check_date_range($values, $fields, $options) {
-    if ( !is_array($values) || !isset($values[0]) )
-      return __('is intended to be used for a group of datepickers');
-
-    $dates = $values[0];
+    $dates = $fields;
 
     if ( !isset($dates['end-date']) || !isset($dates['start-date']) )
       return __('requires start-date and end-date fields to work');
@@ -218,7 +215,7 @@ class PiklistHelperValidations {
     foreach($values[0] as $key => $value) {
       if ( $is_empty ) {
         $is_empty = empty($value);
-          
+
       } else if (empty($value)) {
         return __('must have all the fields filled');
       }
